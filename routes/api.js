@@ -30,17 +30,20 @@ router.post("/poll", (req, res) => {
     
   );
 
-  console.log(newPoll);
-   
-
+  
   newPoll
     .save()
     .then((data) => {
-      console.log(data)
-      res.send("success!")
+      return res.json({
+        message: 'success',
+        data: data,
+      });
     })
     .catch((err) => {
-      err;
+      return res.json({
+        message: 'error',
+        error: err,
+      });
     });
 });
 module.exports = router;
