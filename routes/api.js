@@ -1,8 +1,9 @@
 const express = require("express");
-const res = require("express/lib/response");
-const router = express.Router();
 
-const Users = require("../models/users");
+const router = express.Router();
+const mongoose = require("mongoose");
+const Polls = require("../models/poll");
+
 
 router.get("/users", (req, res) => {
   Users.find({}, function (err, data) {
@@ -16,20 +17,30 @@ router.get("/users", (req, res) => {
   });
 });
 
-router.post("/users", (req, res) => {
-  const reqBody = req.body;
-  console.log(reqBody);
 
-  let newUser = new Users(reqBody);
-  newUser
+router.post("/poll", (req, res) => {
+  const reqBody = req.body;
+
+  let newPoll = new Polls(
+
+    {
+      _id: new mongoose.Types.ObjectId(),
+      pollName: reqBody.data
+    }
+    
+  );
+
+  console.log(newPoll);
+   
+
+  newPoll
     .save()
     .then((data) => {
-      console.log(data);
+      console.log(data)
+      res.send("success!")
     })
     .catch((err) => {
-      console.log(err);
+      err;
     });
-
-  res.send("success");
 });
 module.exports = router;
