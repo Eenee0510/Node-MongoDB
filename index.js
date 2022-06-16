@@ -84,4 +84,4 @@ app.post("/createUser", function (req, res) {
   }); //end of db.getConnection()
 }); //end of app.post()
 
-app.listen(3005, ()=> console.log("server started"));
+app.listen(process.env.PORT, ()=> console.log("server started"));
