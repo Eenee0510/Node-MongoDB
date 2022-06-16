@@ -1,35 +1,93 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
 const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require('cors');
-console.log(process.env.ATLAS_CONNECTION_URL);
-
-const apiRoutes = require("./routes/api");
-const res = require("express/lib/response");
-
-mongoose
-  .connect(process.env.ATLAS_CONNECTION_URL, { useNewUrlParser: true })
-  .then(() => console.log(`Database connected successfully`))
-  .catch((err) => console.log(err));
-
-mongoose.Promise = global.Promise;
+const mysql = require("mysql2");
 const app = express();
 app.use(express.json());
-app.use(cors());
-app.use((res, req, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.header("Content-Type", "application/json");
-  next();
+require("dotenv").config();
+
+const bodyparser = require("body-parser");
+app.use(bodyparser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + "/public"));
+
+const DB_HOST = process.env.DB_HOST;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_DATABASE = process.env.DB_DATABASE;
+
+
+let db = mysql.createPool({
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  multipleStatements: true,
+});
+
+db.getConnection((err) => {
+  if (!err) {
+    console.log("Database connected successfully");
+  } else {
+    console.log("error!" + err);
+  }
+});
+
+app.post("/order", function (req, res) {
+  
+  const productName = req.body.pname;
+  const productSize = req.body.psize;
+  const productQ = req.body.pquantity;
+  const userName = req.body.fname;
+  const userPhone = req.body.fphone;
+  const userCorp = req.body.fcorp;
+
+  
+  db.getConnection(function (err, connection){
+    if (err) throw err;
+    const sqlInsert = "INSERT INTO orders VALUES (?,?,?,?,?,?)";
+    const insert_query = mysql.format(sqlInsert, [ productName, productSize, productQ, userName, userPhone, userCorp]);
+    connection.query(insert_query, function(err, result){
+      if (err) throw err;
+      console.log(result.insertId);
+      console.log("order inserted")
+      res.sendStatus(201);
+    })
+  })
 })
 
+app.post("/createUser", function (req, res) {
+  const user = req.body.phone;
+  const ssImage = req.body.image;
+  db.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sqlSearch = "SELECT * FROM userTable WHERE user = ?";
+    const search_query = mysql.format(sqlSearch, [user]);
+    const sqlInsert = "INSERT INTO userTable VALUES (?,?)";
+    const insert_query = mysql.format(sqlInsert, [user, ssImage]);
+    // ? will be replaced by values
+    // ?? will be replaced by string
+    connection.query(search_query, function (err, result) {
+      if (err) throw err;
+      console.log("------> Search Results");
+      console.log(result.length);
+      if (result.length != 0) {
+        connection.release();
+        console.log("------> User already exists");
+        res.sendStatus(409);
+      } else {
+        connection.query(insert_query, (err, result) => {
+          connection.release();
+          if (err) throw err;
+          console.log("--------> Created new User");
+          if (ssImage == null) {
+            console.log("pls import ss image!!!");
+          } else {
+            console.log("Your 1st asignment is done.");
+          }
+          console.log(result.insertId);
+          res.sendStatus(201);
+        });
+      }
+    }); //end of connection.query()
+  }); //end of db.getConnection()
+}); //end of app.post()
 
-app.use("/api", apiRoutes);
-
-app.listen(process.env.PORT, () => {
-  console.log("Application is started on PORT =" + process.env.PORT);
-});
+app.listen(3000, () => console.log(`Server Started on port...`+3000));
