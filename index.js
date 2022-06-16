@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql");
-
+const bodyparser = require("body-parser")
 const apiRoutes = require("./routes/api");
 
 
@@ -23,6 +23,7 @@ db.getConnection((err) => {
 
 const app = express();
 app.use(express.json());
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use("/api", apiRoutes);
 
 app.listen(3000, () => {
