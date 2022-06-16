@@ -3,7 +3,7 @@ const express = require("express");
 const mysql = require("mysql");
 const bodyparser = require("body-parser")
 const apiRoutes = require("./routes/api");
-
+const cors = require("cors");
 
 let db = mysql.createPool({
   host: "172.104.168.131",
@@ -25,6 +25,9 @@ const app = express();
 app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use("/api", apiRoutes);
+app.use(cors());
+
+
 
 app.listen(3000, () => {
   console.log("Application is started on PORT =");

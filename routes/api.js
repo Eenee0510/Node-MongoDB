@@ -1,9 +1,10 @@
 const express = require("express");
 const mysql = require("mysql");
 const router = express.Router();
+const path = require('path');
 
-
-
+const app = express();
+app.use(express.static(__dirname));
 router.post("/order", function (req, res) {
   
   const productName = req.body.pname;
@@ -28,8 +29,10 @@ router.post("/order", function (req, res) {
     connection.query(insert_query, function(err, result){
       if (err) throw err;
     
-      res.sendStatus(201);
+      
     })
+    
+    res.sendFile(path.join(__dirname, '/index.html'));
   })
 })
 
