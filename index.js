@@ -46,8 +46,7 @@ app.post("/order", function (req, res) {
     const insert_query = mysql.format(sqlInsert, [ productName, productSize, productQ, userName, userPhone, userCorp]);
     connection.query(insert_query, function(err, result){
       if (err) throw err;
-      console.log(result.insertId);
-      console.log("order inserted")
+    
       res.sendStatus(201);
     })
   })
@@ -90,4 +89,4 @@ app.post("/createUser", function (req, res) {
   }); //end of db.getConnection()
 }); //end of app.post()
 
-app.listen(3000, () => console.log(`Server Started on port...`+3000));
+app.listen(3005);
