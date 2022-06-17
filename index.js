@@ -23,9 +23,19 @@ db.getConnection((err) => {
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+app.use((res, req, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Content-Type", "application/json");
+  next();
+})
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use("/api", apiRoutes);
-app.use(cors());
+
 
 
 
