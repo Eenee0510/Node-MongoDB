@@ -35,7 +35,7 @@ router.post("/order", function (req, res) {
 router.post("/lottery", function (req, res) {
   
   const phone = req.body.phone;
-  const ss_image = req.body.ss_image;
+  
   console.log(req.body)
   let db = mysql.createPool({
     host: "172.104.168.131",
@@ -50,8 +50,8 @@ router.post("/lottery", function (req, res) {
     if (err) throw err;
     const sqlSearch = "SELECT * FROM lucky_user WHERE phone = ?";
     const search_query = mysql.format(sqlSearch, [phone]);
-    const sqlInsert = "INSERT INTO lucky_user(phone, ss_image, gift_name, gift_id) select ?,?, gift_name, gift_id from gifts where quantity = 1 order by rand() limit 1; update gifts set quantity = 0 where gift_id = (select gift_id from lucky_user where lucky_id = LAST_INSERT_ID()); select * from lucky_user where lucky_id = LAST_INSERT_ID();" ;
-    const insert_query = mysql.format(sqlInsert, [phone, ss_image]);
+    const sqlInsert = "INSERT INTO lucky_user(phone, gift_name, gift_id) select ?, gift_name, gift_id from gifts where quantity = 1 order by rand() limit 1; update gifts set quantity = 0 where gift_id = (select gift_id from lucky_user where lucky_id = LAST_INSERT_ID()); select * from lucky_user where lucky_id = LAST_INSERT_ID();" ;
+    const insert_query = mysql.format(sqlInsert, [phone]);
    
     
     // ? will be replaced by values
