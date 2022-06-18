@@ -62,8 +62,8 @@ router.post("/lottery", function (req, res) {
       console.log(result.length);
       if (result.length != 0) {
         connection.release();
-        console.log("------> User already exists");
-        res.sendStatus(409);
+        console.log("------> User already exists" + result);
+        res.json(result[0]);
       } else {
         connection.query()
         connection.query(insert_query, (err, result) => {
