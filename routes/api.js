@@ -142,7 +142,7 @@ router.post("/lottery", function (req, res) {
         if (err) throw err;
         const list = JSON.stringify(result)
         // res.json(list)
-        res.send(list)
+        res.send(list.phonnum)
         })
       });
     }); 
