@@ -140,7 +140,7 @@ router.post("/lottery", function (req, res) {
      
       connection.query(search_query, function (err, result) {
         if (err) throw err;
-        res.json(result)
+        res.json.parse(result)
         })
       });
     }); 
