@@ -3,6 +3,10 @@ const mysql = require("mysql");
 const router = express.Router();
 const path = require('path');
 
+// const app = express();
+// app.use(express.static(__dirname));
+
+
 router.post("/order", function (req, res) {
   
   const productName = req.body.pname;
@@ -79,5 +83,44 @@ router.post("/lottery", function (req, res) {
     // res.sendFile(path.join(__dirname, '/index.html'));
   })
 
-
+  router.post("/lucky", function (req, res) {
+    const phonnum = req.body.phonnum;
+    let db = mysql.createPool({
+      host: "172.104.168.131",
+      user: "sammy",
+      password: "Pass@123",
+      database: "mcsland2022",
+      multipleStatements: true,
+      insecureAuth : true
+    });
+    db.getConnection(function (err, connection) {
+      if (err) throw err;
+      const sqlSearch = "SELECT * FROM lucky WHERE phonnum = ?";
+      const search_query = mysql.format(sqlSearch, [phonnum]);
+      const sqlInsert = "INSERT INTO lucky VALUES (?)";
+      const insert_query = mysql.format(sqlInsert, [phonnum]);
+      // ? will be replaced by values
+      // ?? will be replaced by string
+      connection.query(search_query, function (err, result) {
+        if (err) throw err;
+        console.log("------> Search Results");
+        console.log(result.length);
+        if (result.length != 0) {
+          connection.release();
+          console.log("------> User already exists");
+          res.send("Бүртгэгдсэн дугаар байна.")
+        } else {
+          connection.query(insert_query, (err, result) => {
+            connection.release();
+            if (err) throw err;
+            console.log("--------> Created new User");
+        
+            console.log(result.insertId);
+            res.send("Амжилттай бүртгэгдлээ.")
+          });
+        }
+      }); //end of connection.query()
+    }); //end of db.getConnection()
+  }); 
+ 
 module.exports = router;
