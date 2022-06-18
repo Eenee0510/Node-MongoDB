@@ -122,5 +122,28 @@ router.post("/lottery", function (req, res) {
       }); //end of connection.query()
     }); //end of db.getConnection()
   }); 
+
+  router.get("/lists", function (req, res) {
+    
+    let db = mysql.createPool({
+      host: "172.104.168.131",
+      user: "sammy",
+      password: "Pass@123",
+      database: "mcsland2022",
+      multipleStatements: true,
+      insecureAuth : true
+    });
+    db.getConnection(function (err, connection) {
+      if (err) throw err;
+      const sqlSearch = "SELECT * FROM lucky";
+      const search_query = mysql.format(sqlSearch);
+     
+      connection.query(search_query, function (err, result) {
+        if (err) throw err;
+        res.send(result)
+        })
+      });
+    }); 
+  
  
 module.exports = router;
